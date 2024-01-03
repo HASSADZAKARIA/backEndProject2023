@@ -1,15 +1,78 @@
 let Assignment = require('../model/assignment');
 
 // Récupérer tous les assignments (GET)
-function getAssignments(req, res){
-    Assignment.find((err, assignments) => {
-        if(err){
-            res.send(err)
-        }
+// function getAssignments(req, res){
+//     Assignment.find((err, assignments) => {
+//         if(err){
+//             res.send(err)
+//         }
 
-        res.send(assignments);
-    });
-}
+//         res.send(assignments);
+//     });
+// }
+
+// function getAssignments(req, res){
+//     var aggregateQuery = Assignment.aggregate();
+
+//     Assignment.aggregatePaginate(
+//         aggregateQuery,
+//         {
+//             page: parseInt(req.query.page) || 1,
+//             limit: parseInt(req.query.limit) || 10,
+//         },
+//         (err, assignments) => {
+//             if(err){
+//                 res.send(err);
+//             }
+//             res.send(assignments);
+            
+//         }
+//     );
+// }
+
+ function getAssignments(req, res) {
+     var aggregateQuery = Assignment.aggregate();
+
+     Assignment.aggregatePaginate(
+         aggregateQuery,
+         {
+             page: parseInt(req.query.page) || 1,
+             limit: parseInt(req.query.limit) || 10,
+         },
+         (err, result) => {
+             if (err) {
+                 res.status(500).send(err);
+             } else {
+                 res.json({
+                    
+                     assignments: result.docs, // Utilisez "docs" pour obtenir les données
+                     totalAssignments: result.totalDocs,
+                     currentPage: result.page,
+                     limit: result.limit,
+                     totalPages: result.totalPages,
+                     hasNextPage: result.hasNextPage,
+                     hasPrevPage: result.hasPrevPage,
+                     nextPage: result.nextPage,
+                     prevPage: result.prevPage,
+                 });
+             }
+         }
+     );
+ }
+
+
+// function getAssignments(req, res){
+//     // Récupérer les paramètres de pagination de la requête
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 10;
+
+//     Assignment.paginate({}, { page, limit }, (err, assignments) => {
+//         if(err){
+//             res.send(err)
+//         }
+//         res.send(assignments);
+//     });
+// }
 
 // Récupérer un assignment par son id (GET)
 function getAssignment(req, res){
